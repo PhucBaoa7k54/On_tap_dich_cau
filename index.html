@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Thi Trắc Nghiệm</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        :root { --primary: #003366; --accent: #c0392b; --bg: #fdfdfd; }
+        body { font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; }
+        
+        #quiz-container { background: white; width: 100%; max-width: 900px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); overflow: hidden; }
+        .quiz-header { background: var(--primary); color: white; padding: 22px; text-align: center; }
+        .info-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 24px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; font-weight: 600; font-size: 0.875rem; }
+        .quiz-content { padding: 28px; }
+        .question-box { font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-bottom: 20px; line-height: 1.5; }
+        .option-btn { display: block; width: 100%; padding: 14px 18px; margin-bottom: 12px; border: 2px solid #e2e8f0; border-radius: 10px; text-align: left; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: all 0.2s; background: #fff; color: #334155; }
+        .option-btn:hover { background: #f0f7ff; border-color: #38bdf8; color: #0284c7; }
+        .correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; font-weight: 700; }
+        .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+        .explanation { margin-top: 20px; padding: 18px; background: #fef3c7; border-left: 6px solid #f59e0b; line-height: 1.6; border-radius: 0 10px 10px 0; color: #78350f; font-size: 0.9rem; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-action:hover { opacity: 0.92; transform: translateY(-1px); }
+        
+        .radio-card input[type="radio"]:checked + div {
+            border-color: #0284c7;
+            background-color: #f0f9ff;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+        }
+        .radio-card input[type="radio"]:checked + div .radio-dot {
+            border-color: #0284c7;
+            background-color: #0284c7;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="h-full min-h-screen bg-slate-100 flex flex-col text-slate-800 antialiased">
+
+    <!-- NAVIGATION HEADER -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div>
+                    <h1 class="font-bold text-white text-base sm:text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced text-sky-400"></i> Ôn Thi Trắc Nghiệm
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Ngân hàng câu hỏi</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="goToExamConfig()" id="tabBtnConfig" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white flex items-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-sliders"></i> <span>Cấu Hình Bài Thi</span> 
+                    <span id="bankBadge" class="ml-1 bg-emerald-500 text-white px-1.5 py-0.2 rounded-full text-[10px]">0 câu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center items-center">
+
+        <!-- ======================================================================= -->
+        <!-- MÀN HÌNH CHỌN CẤU HÌNH BÀI THI -->
+        <!-- ======================================================================= -->
+        <div id="step-config" class="w-full flex-1 flex justify-center items-center py-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-2xl w-full p-6 sm:p-8">
+                <div class="text-center mb-6 pb-4 border-b border-slate-100">
+                    <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-900">Cấu Hình Thông Số Bài Thi Trắc Nghiệm</h2>
+                    <p class="text-xs text-slate-500 mt-1">Chọn thông số phù hợp để bắt đầu làm bài[cite: 5].</p>
+                </div>
+
+                <form id="configForm" onsubmit="event.preventDefault(); validateAndStartExam();" class="space-y-6">
+                    
+                    <!-- 1. Chọn số câu hỏi làm bài -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-800 mb-2 flex items-center gap-1">
+                            <span>1. Chọn số lượng câu hỏi làm bài</span> <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="numExamQuestions" value="20" class="sr-only">
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">20 Câu</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="numExamQuestions" value="40" class="sr-only" checked>
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">40 Câu</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="numExamQuestions" value="60" class="sr-only">
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">60 Câu</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="numExamQuestions" value="ALL" class="sr-only">
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">Toàn Bộ</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 2. Thời gian làm bài tổng thể -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-800 mb-2 flex items-center gap-1">
+                            <span>2. Chọn thời gian làm bài tổng thể</span> <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="totalExamTime" value="15" class="sr-only">
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">15 Phút</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="totalExamTime" value="30" class="sr-only">
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">30 Phút</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="totalExamTime" value="45" class="sr-only" checked>
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">45 Phút</span>
+                                </div>
+                            </label>
+
+                            <label class="radio-card cursor-pointer">
+                                <input type="radio" name="totalExamTime" value="60" class="sr-only">
+                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
+                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
+                                    <span class="text-xs font-bold text-slate-700">60 Phút</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
+                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-700 hover:to-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i> BẮT ĐẦU LÀM BÀI THI
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- ======================================================================= -->
+        <!-- MÀN HÌNH LÀM BÀI THI & KẾT QUẢ -->
+        <!-- ======================================================================= -->
+        <div id="step-exam" class="hidden w-full flex-1 flex justify-center items-start pt-2">
+            <div id="quiz-container">
+                <div class="quiz-header">
+                    <h1 class="text-xl font-bold tracking-wide">BÀI THI TRẮC NGHIỆM LUẬT TTHC 2015</h1>
+                </div>
+
+                <!-- Exam Screen -->
+                <div id="quiz-screen">
+                    <div class="info-bar">
+                        <span>Tiến độ: <span id="q-current" class="text-sky-600">1</span>/<span id="q-total">40</span></span>
+                        <span class="text-indigo-600"><i class="fa-solid fa-hourglass-half mr-1"></i>Thời gian còn lại: <span id="total-time-left">45:00</span></span>
+                        <span>
+                            Đúng: <span id="score-count" style="color: #28a745;">0</span> | 
+                            Sai: <span id="wrong-count" style="color: #dc3545;">0</span>
+                        </span>
+                    </div>
+                    <div class="quiz-content">
+                        <div id="question-text" class="question-box"></div>
+                        <div id="options-list"></div>
+                        <div id="exp-area" class="explanation hidden"></div>
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button id="btn-next" class="btn-action hidden" onclick="handleNext()">
+                                TIẾP THEO &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Screen -->
+                <div id="result-screen" class="hidden" style="text-align: center; padding: 40px 20px;">
+                    <h2 class="text-xl font-bold text-slate-800">KẾT THÚC BÀI KIỂM TRA</h2>
+                    <h1 id="final-stats" class="text-4xl font-black text-sky-700 my-4">0/40</h1>
+                    <div id="fail-info" style="color: red; margin-bottom: 20px;" class="text-sm font-medium"></div>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <button class="btn-action" onclick="restartWithErrors()">
+                            <i class="fa-solid fa-rotate-right"></i> ÔN LẠI CÂU SAI
+                        </button>
+                        <button class="btn-action" style="background:#0284c7" onclick="goToExamConfig()">
+                            <i class="fa-solid fa-sliders"></i> TẠO BÀI THI MỚI
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toastMessage">Thông báo!</span>
+    </div>
+
+    <!-- Modal Tiếp Tục Bài Làm (Resume Saved Progress) -->
+    <div id="resumeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-900 text-base">Phát hiện bài làm chưa hoàn thành!</h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed" id="resumeModalInfo">
+                    Bạn đang làm dở ở <b>câu <span id="resumeQNum">1</span></b> với thời gian còn lại <b><span id="resumeTimeLeft">00:00</span></b>[cite: 5].
+                </p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 flex justify-around font-semibold border border-slate-200">
+                <span>Đúng: <b id="resumeCorrect" class="text-emerald-600">0</b></span>
+                <span>|</span>
+                <span>Sai: <b id="resumeWrong" class="text-rose-600">0</b></span>
+                <span>|</span>
+                <span>Tổng: <b id="resumeTotal" class="text-sky-600">0</b> câu</span>
+            </div>
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="discardSavedExam()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Làm lại từ đầu
+                </button>
+                <button onclick="resumeSavedExam()" class="flex-1 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md transition-all">
+                    <i class="fa-solid fa-play mr-1"></i> Tiếp tục làm bài
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SYSTEM CORE LOGIC -->
+    <script>
+        // Dữ liệu ngân hàng câu hỏi tích hợp sẵn từ file Luật TTHC 2015
+        const questionBank = [
+// ==================== UNIT 9: COMPANY INTERNAL FINANCE ====================
+  {
+    "q": "Câu 61 (Unit 9 - I.1): The café Bong runs a membership program, and members are .......... to a 15% discount.",
+    "options": [
+      "close",
+      "subject",
+      "apt",
+      "entitled"
+    ],
+    "correct": 3,
+    "exp": "Cấu trúc 'be entitled to something' nghĩa là có quyền được hưởng ưu đãi/quyền lợi gì."
+  },
+  {
+    "q": "Câu 62 (Unit 9 - I.2): The company delayed its expansion plans .......... rising operating costs.",
+    "options": [
+      "because of",
+      "because",
+      "although",
+      "since"
+    ],
+    "correct": 0,
+    "exp": "Sau chỗ trống là cụm danh từ 'rising operating costs' nên dùng giới từ 'because of' (bởi vì)."
+  },
+  {
+    "q": "Câu 63 (Unit 9 - I.3): If we offer incentives for quick payment, our customers .......... more quickly.",
+    "options": [
+      "will pay",
+      "would pay",
+      "should pay",
+      "must pay"
+    ],
+    "correct": 0,
+    "exp": "Câu điều kiện loại 1 (điều kiện có thể xảy ra ở hiện tại/tương lai): If + S + V(hiện tại đơn), S + will + V(nguyên thể)."
+  },
+  {
+    "q": "Câu 64 (Unit 9 - I.4): General Motors plans to .......... shareholders a higher dividend this year.",
+    "options": [
+      "offer",
+      "deduct",
+      "calculate",
+      "reduce"
+    ],
+    "correct": 0,
+    "exp": "Cụm từ 'offer shareholders a higher dividend' mang nghĩa trả/chia cho cổ đông mức cổ tức cao hơn."
+  },
+  {
+    "q": "Câu 65 (Unit 9 - I.5): Its machines have to be .......... every three years because of new technology and this uses up a lot of its profits every year.",
+    "options": [
+      "replace",
+      "replacing",
+      "replaced",
+      "replacement"
+    ],
+    "correct": 2,
+    "exp": "Cấu trúc bị động với động từ khuyết thiếu: 'have to be + V3/ed' (cần được thay thế)."
+  },
+  {
+    "q": "Câu 66 (Unit 9 - I.6): One of the finance managers .......... responsible for preparing the annual income statement.",
+    "options": [
+      "is",
+      "are",
+      "were",
+      "have been"
+    ],
+    "correct": 0,
+    "exp": "Chủ ngữ chính là 'One of + danh từ số nhiều' nên động từ chia ở ngôi thứ 3 số ít ('is')."
+  },
+  {
+    "q": "Câu 67 (Unit 9 - I.7): The site is worth $20m, but .......... needs modernization and the company doesn't have the funds to do the work.",
+    "options": [
+      "bad",
+      "badly",
+      "worse",
+      "worst"
+    ],
+    "correct": 1,
+    "exp": "Cần một trạng từ ('badly' - rất/vô cùng) để bổ nghĩa cho động từ 'needs' phía sau."
+  },
+  {
+    "q": "Câu 68 (Unit 9 - I.8): The company has recovered .......... a huge setback, but it still has a lot of things to do to improve its sales.",
+    "options": [
+      "for",
+      "except",
+      "from",
+      "despite"
+    ],
+    "correct": 2,
+    "exp": "Cụm động từ cố định 'recover from something' nghĩa là phục hồi sau một thất bại/trở ngại."
+  },
+  {
+    "q": "Câu 69 (Unit 9 - I.9): A research shows that when a company .......... its operating costs, its profits usually increase.",
+    "options": [
+      "reduces",
+      "reduce",
+      "reducing",
+      "reduced"
+    ],
+    "correct": 0,
+    "exp": "Diễn tả một sự thật/quy luật chung ở thì hiện tại đơn; chủ ngữ 'a company' số ít nên động từ thêm 's' ('reduces')."
+  },
+  {
+    "q": "Câu 70 (Unit 9 - I.10): If the company had higher operating profits, it .......... pay larger dividends to its shareholders.",
+    "options": [
+      "will",
+      "would",
+      "can",
+      "must"
+    ],
+    "correct": 1,
+    "exp": "Câu điều kiện loại 2 (giả định trái với hiện tại): If + S + V(quá khứ đơn - had), S + would + V(nguyên thể)."
+  },
+
+  // ==================== REVIEW 1 ====================
+  {
+    "q": "Câu 71 (Review 1 - I.1): In the UK, the primary sector is .......... up of farming and energy-related activities.",
+    "options": [
+      "making",
+      "made",
+      "to make",
+      "makes"
+    ],
+    "correct": 1,
+    "exp": "Cấu trúc bị động cố định 'be made up of...' nghĩa là được cấu thành/bao gồm bởi (Lưu ý: sách khoanh A là nhầm)."
+  },
+  {
+    "q": "Câu 72 (Review 1 - I.2): Many investors look for .......... companies with strong long-term growth.",
+    "options": [
+      "profit",
+      "profitable",
+      "profitability",
+      "profitably"
+    ],
+    "correct": 1,
+    "exp": "Cần một tính từ đứng trước danh từ 'companies' để tạo cụm danh từ 'profitable companies' (các công ty có khả năng sinh lời)."
+  },
+  {
+    "q": "Câu 73 (Review 1 - I.3): Most companies .......... shares to raise money for future expansion.",
+    "options": [
+      "issue",
+      "spread",
+      "quote",
+      "underwrite"
+    ],
+    "correct": 0,
+    "exp": "Cụm từ chuyên ngành 'issue shares' nghĩa là phát hành cổ phiếu để huy động vốn."
+  },
+  {
+    "q": "Câu 74 (Review 1 - I.4): Despite government support, the sector has .......... from 20% to 15% of GDP over past twenty years.",
+    "options": [
+      "rose",
+      "grown",
+      "decreased",
+      "increased"
+    ],
+    "correct": 2,
+    "exp": "Tỷ trọng giảm từ 20% xuống 15% nên dùng động từ 'decreased' (giảm xuống)."
+  },
+  {
+    "q": "Câu 75 (Review 1 - I.5): .......... agriculture employs only 1% of the workforce, it produces 60% of UK food.",
+    "options": [
+      "Although",
+      "Despite",
+      "However",
+      "In spite of"
+    ],
+    "correct": 0,
+    "exp": "Sau chỗ trống là một mệnh đề đầy đủ (S + V) mang nghĩa tương phản nên dùng liên từ 'Although' (Mặc dù)."
+  },
+  {
+    "q": "Câu 76 (Review 1 - I.6): The retail bank focuses on individual customers, .......... the investment bank mainly serves large companies.",
+    "options": [
+      "because",
+      "whereas",
+      "therefore",
+      "unless"
+    ],
+    "correct": 1,
+    "exp": "Liên từ 'whereas' (trong khi đó) dùng để nối hai mệnh đề có chức năng đối lập nhau."
+  },
+  {
+    "q": "Câu 77 (Review 1 - I.7): What special .......... do they offer companies?",
+    "options": [
+      "auditors",
+      "investors",
+      "incentives",
+      "mergers"
+    ],
+    "correct": 2,
+    "exp": "Danh từ 'incentives' (các chính sách ưu đãi/khuyến khích) phù hợp về nghĩa với động từ 'offer'."
+  },
+  {
+    "q": "Câu 78 (Review 1 - I.8): The cash flow of a company is a simple record of the real .......... of money into, and out of, the company's accounts.",
+    "options": [
+      "movement",
+      "move",
+      "moving",
+      "moved"
+    ],
+    "correct": 0,
+    "exp": "Sau mạo từ 'the' và tính từ 'real' cần một danh từ ('movement' - sự luân chuyển/dịch chuyển dòng tiền)."
+  },
+  {
+    "q": "Câu 79 (Review 1 - I.9): During her internship, she .......... working with the finance team.",
+    "options": [
+      "enjoyed",
+      "wanted",
+      "would like",
+      "decided"
+    ],
+    "correct": 0,
+    "exp": "Chỉ có động từ 'enjoy' đi kèm trực tiếp với danh động từ V-ing ('enjoyed working'), các từ còn lại đi với to-V."
+  },
+  {
+    "q": "Câu 80 (Review 1 - I.10): The financial adviser encouraged the company .......... its operating costs.",
+    "options": [
+      "reduce",
+      "reducing",
+      "to reduce",
+      "reduced"
+    ],
+    "correct": 2,
+    "exp": "Cấu trúc 'encourage someone to do something' (khuyến khích ai/tổ chức nào làm gì)."
+  },
+
+  // ==================== UNIT 10: COMPANY REPORTING ====================
+  {
+    "q": "Câu 81 (Unit 10 - I.1): A company's .......... report is a comprehensive document containing complex details, including its financial accounts.",
+    "options": [
+      "financial",
+      "economic",
+      "strategic",
+      "annual"
+    ],
+    "correct": 3,
+    "exp": "Thuật ngữ 'annual report' nghĩa là báo cáo thường niên của công ty."
+  },
+  {
+    "q": "Câu 82 (Unit 10 - I.2): It is a legal requirement for public companies to publish an annual report each year and send it to all ..........",
+    "options": [
+      "publishers",
+      "shareholders",
+      "investors",
+      "sellers"
+    ],
+    "correct": 1,
+    "exp": "Theo luật, công ty đại chúng phải gửi báo cáo thường niên tới tất cả các cổ đông ('shareholders')."
+  },
+  {
+    "q": "Câu 83 (Unit 10 - I.3): Most of the patient files are stored .......... secure cabinets on the fourth floor, which has a high level of security.",
+    "options": [
+      "over",
+      "by",
+      "to",
+      "in"
+    ],
+    "correct": 3,
+    "exp": "Lưu trữ hồ sơ bên trong tủ bảo mật dùng giới từ 'in' ('stored in secure cabinets')."
+  },
+  {
+    "q": "Câu 84 (Unit 10 - I.4): In the middle sections of a UK report there is now a section called .........., which explains the way the company is managed by its board of directors.",
+    "options": [
+      "corporate governance",
+      "corporate govern",
+      "corporate governing",
+      "corporated govern"
+    ],
+    "correct": 0,
+    "exp": "Thuật ngữ kinh tế chuẩn xác là 'corporate governance' (quản trị doanh nghiệp)."
+  },
+  {
+    "q": "Câu 85 (Unit 10 - I.5): By encouraging innovative promotional ideas, the company hopes to gain a .......... market share than it had previously.",
+    "options": [
+      "highly",
+      "high",
+      "higher",
+      "highest"
+    ],
+    "correct": 2,
+    "exp": "Có từ 'than' phía sau nên sử dụng tính từ so sánh hơn 'higher' (thị phần cao hơn)."
+  },
+  {
+    "q": "Câu 86 (Unit 10 - I.6): Prior .......... starting the tournament, they shook hands and promised to play fair.",
+    "options": [
+      "to",
+      "than",
+      "as",
+      "before"
+    ],
+    "correct": 0,
+    "exp": "Cụm giới từ cố định 'prior to + V-ing/N' có nghĩa là trước khi làm gì."
+  },
+  {
+    "q": "Câu 87 (Unit 10 - I.7): Rev Furniture has high-quality handmade goods and reasonable delivery ..........",
+    "options": [
+      "routines",
+      "trucks",
+      "duties",
+      "fees"
+    ],
+    "correct": 3,
+    "exp": "Cụm danh từ 'delivery fees' nghĩa là phí vận chuyển/giao hàng."
+  },
+  {
+    "q": "Câu 88 (Unit 10 - I.8): Politicians are said to be the .......... reliable people in the world; nevertheless, there are always some people who seek such a career.",
+    "options": [
+      "less",
+      "least",
+      "more",
+      "worst"
+    ],
+    "correct": 1,
+    "exp": "Có mạo từ 'the' phía trước tính từ dài 'reliable' nên dùng cấu trúc so sánh nhất 'the least reliable' (kém đáng tin cậy nhất)."
+  },
+  {
+    "q": "Câu 89 (Unit 10 - I.9): At the end of the report, you will always find the .......... statements: these contain essential information for investors.",
+    "options": [
+      "financially",
+      "financial",
+      "finance",
+      "financing"
+    ],
+    "correct": 1,
+    "exp": "Thuật ngữ kế toán - tài chính chuẩn là 'financial statements' (báo cáo tài chính)."
+  },
+{
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Unit 9 - IV.1.a): If we can reduce the price we are paying for materials, we'll be able to make some savings.",
+    "answer": "Nếu chúng ta có thể giảm mức giá mà chúng ta phải trả cho nguyên vật liệu, chúng ta sẽ có thể tiết kiệm được một số tiền.",
+    "exp": "Cấu trúc: reduce the price (giảm giá), pay for materials (trả tiền cho nguyên vật liệu), make some savings (tiết kiệm được một khoản)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Unit 9 - IV.1.b): All companies need money to finance their daily operations. This money comes from a variety of sources. Typically, it comes from owners, from trading income, and from the banks.",
+    "answer": "Tất cả các công ty đều cần tiền để tài trợ cho các hoạt động hàng ngày của họ. Số tiền này đến từ nhiều nguồn khác nhau. Thông thường, nó đến từ chủ sở hữu, từ thu nhập giao dịch và từ các ngân hàng.",
+    "exp": "Thuật ngữ: finance daily operations (tài trợ cho hoạt động hàng ngày), a variety of sources (nhiều nguồn khác nhau), trading income (thu nhập kinh doanh/thương mại)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Unit 9 - IV.1.c): There are many different ways in which to look at the profits a company makes because accountants need to measure the efficiency of different activities in the business.",
+    "answer": "Có nhiều cách khác nhau để xem xét lợi nhuận mà một công ty tạo ra vì các kế toán viên cần đo lường hiệu quả của các hoạt động khác nhau trong doanh nghiệp.",
+    "exp": "Thuật ngữ: look at the profits (xem xét lợi nhuận), measure the efficiency (đo lường hiệu quả)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Anh (Unit 9 - IV.2.a): Năm ngoái công ty của chúng ta đã chịu thua lỗ vì chúng ta đã không thể tăng giá sản phẩm đủ để bù đắp cho các khoản chi phí.",
+    "answer": "Last year, our company suffered a loss because we were unable to increase product prices enough to cover the costs.",
+    "exp": "Cụm từ: make a loss / suffer a loss (chịu thua lỗ), cover the costs (bù đắp chi phí)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Anh (Unit 9 - IV.2.b): Khi công ty cần huy động thêm vốn để phát triển sản xuất, họ có thể đề nghị các cổ đông giúp đỡ.",
+    "answer": "When companies need to raise more capital to develop production, they can ask shareholders for help.",
+    "exp": "Cụm từ: raise more capital / raise more funds (huy động thêm vốn), expand production (phát triển/mở rộng sản xuất), ask shareholders for help (đề nghị cổ đông giúp đỡ)."
+  },
+
+  // ==================== PHẦN IV. TRANSLATION - REVIEW 1 ====================
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Review 1 - IV.1.a): The profit is distributed to shareholders as a dividend, usually paid twice a year. The best way to make money on the markets is to invest your money for at least five years.",
+    "answer": "Lợi nhuận được chia cho các cổ đông dưới dạng cổ tức, thường được trả hai lần một năm. Cách duy nhất để kiếm tiền trên thị trường là đầu tư tiền của bạn trong ít nhất năm năm.",
+    "exp": "Thuật ngữ: distribute profit to shareholders (chia lợi nhuận cho cổ đông), dividend (cổ tức)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Review 1 - IV.1.b): A system of borrowing in which you take out a loan by offering the guarantee of some asset, usually a building, as a security. This can be much cheaper than other forms of loan.",
+    "answer": "Một hệ thống vay trong đó bạn vay tiền bằng cách đưa ra sự bảo đảm bằng một số tài sản, thường là một tòa nhà, làm vật đảm bảo. Hình thức này có thể rẻ hơn nhiều so với các hình thức cho vay khác.",
+    "exp": "Thuật ngữ: take out a loan (nhận một khoản vay), offer the guarantee of some asset as a security (đưa tài sản làm vật bảo đảm/thế chấp)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Review 1 - IV.1.c): Supermarkets and shop owners protest as government bans all petrol-driven cars from city centers.",
+    "answer": "Các siêu thị và chủ cửa hàng phản đối khi chính phủ cấm tất cả các loại xe chạy bằng xăng khỏi trung tâm thành phố.",
+    "exp": "Từ vựng: protest (phản đối), petrol-driven cars (xe chạy bằng xăng)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Anh (Review 1 - IV.2.a): Các công ty báo cáo tài chính cho công chúng thông qua một số kênh. Theo luật, tất cả các công ty phải tổ chức đại hội cổ đông hàng năm và công bố báo cáo cho tất cả các cổ đông.",
+    "answer": "Companies report their finances to the public through a number of different channels. By law, all companies must hold an annual general meeting and publish an annual reports to distribute to all shareholders.",
+    "exp": "Thuật ngữ: by law (theo luật), hold an annual general meeting / AGM (tổ chức đại hội cổ đông thường niên), publish reports (công bố báo cáo)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Anh (Review 1 - IV.2.b): Khi mức lãi suất cao, một doanh nghiệp có thể không đi vay. Ví dụ, một công ty muốn mua thiết bị mới có thể trì hoãn việc mở rộng sản xuất cho đến khi vay được một khoản với lãi suất hấp dẫn hơn.",
+    "answer": "When interest rates in general are high, a business may be reluctant to take out a loan. For example, a company wanting to buy new equipment may delay its expansion until it can borrow at better interest rate.",
+    "exp": "Cấu trúc: interest rates (lãi suất), delay + V-ing (trì hoãn làm gì), take out a loan at a more attractive interest rate (vay khoản vay với lãi suất hấp dẫn hơn)."
+  },
+
+  // ==================== PHẦN IV. TRANSLATION - UNIT 10 ====================
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Unit 10 - IV.1.a): By law, a company has to send its annual reports and accounts to the financial authorities and it is my job to make sure that we do this on time.",
+    "answer": "Theo luật , một công ty phải gửi báo cáo tài chính hàng năm cho cơ quan tài chính và tôi có nhiệm vụ phải chắc chắn rằng chứng ta hoàn thành báo cáo đúng hạn.",
+    "exp": "Thuật ngữ: annual reports and accounts (báo cáo thường niên và sổ sách kế toán), financial authorities (cơ quan quản lý tài chính)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Unit 10 - IV.1.b): On the other side of the balance sheet are the liabilities: all the money the company still owes and must pay to other people such as the banks, creditors, and other forms of debt. These are also divided into short-term liabilities that the company must pay soon, and long-term liabilities, like bank loans and shares issued.",
+    "answer": "Một bên của bảng cân đối kế toán là các khoản nợ: Tất cả số tiền công ty nợ và phải trả cho những người khác như ngân hàng, chủ nợ và các hình thức khác. Chúng cũng được chia thành nợ ngắn hạn mà công ty phải trả trong thời gian ngắn và nợ dài hạn, chẳng hạn như các khoản vay ngân hàng và cổ phiếu phát hành.",
+    "exp": "Thuật ngữ: balance sheet (bảng cân đối kế toán), liabilities (nợ phải trả), creditors (chủ nợ), short-term/long-term liabilities (nợ ngắn hạn/nợ dài hạn)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Việt (Unit 10 - IV.1.c): To see how the company is performing, one good place to start is the chairman's statement, sometimes called 'a letter to shareholders'.",
+    "answer": "Để nắm được tình hình hoạt động công ty, điều kiện đầu tiên nên làm là xem báo cáo của chủ tịch công ty đó, đôi khi được gọi là 'thư gửi các cổ đông'.",
+    "exp": "Thuật ngữ: chairman's statement (báo cáo của chủ tịch HĐQT), letter to shareholders (thư gửi cổ đông)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Anh (Unit 10 - IV.2.a): Năm ngoái công ty của chúng ta đã chịu thua lỗ vì chúng ta đã không thể tăng giá sản phẩm đủ để bù đắp cho các khoản chi phí. Chúng ta phải đóng thuế hàng hóa, thuế giá trị gia tăng, thuế tài sản và thuế thu nhập doanh nghiệp.",
+    "answer": "Last year, our company suffered a loss because we were unable to increase product prices enough to offset costs. We must pay goods tax, value-added tax, property tax, and corporate income tax.",
+    "exp": "Thuật ngữ các loại thuế: goods tax (thuế hàng hóa), value-added tax / VAT (thuế GTGT), property tax (thuế tài sản), corporate income tax (thuế thu nhập doanh nghiệp)."
+  },
+  {
+    "type": "typing",
+    "q": "Dịch sang tiếng Anh (Unit 10 - IV.2.b): Tất cả các doanh nghiệp cần phải ghi lại các giao dịch tài chính để biết chúng có mang lại lợi nhuận hay không. Nợ được chia thành 2 nhóm: Nợ phải thanh toán trong suốt năm hiện đang kinh doanh và nợ phải được thanh toán qua nhiều năm.",
+    "answer": "All businesses need to record financial transactions to know if they are profitable or not. Debt is divided into two groups: debt that must be paid within the current business year and debt that must be paid over multiple years.",
+    "exp": "Thuật ngữ: record financial transactions (ghi chép giao dịch tài chính), current trading year (năm kinh doanh hiện tại)."
+  }
+        ];
+
+        let examConfig = {
+            numQuestions: 40,
+            totalExamTimeMinutes: 45
+        };
+
+        let quizBank = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalExamTimer = null;
+        let totalExamSecondsLeft = 2700;
+        let errorList = [];
+        let currentShuffledOptions = [];
+        let correctOptionIndex = 0;
+
+        window.onload = () => {
+            document.getElementById('bankBadge').innerText = `${questionBank.length} câu`;
+            checkSavedProgress();
+        };
+
+        function saveExamProgress() {
+            const progressData = {
+                quizBank: quizBank,
+                currentQuestionIndex: currentQuestionIndex,
+                score: score,
+                errorList: errorList,
+                totalExamSecondsLeft: totalExamSecondsLeft,
+                examConfig: examConfig,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('QUIZ_ACTIVE_PROGRESS', JSON.stringify(progressData));
+        }
+
+        function clearExamProgress() {
+            localStorage.removeItem('QUIZ_ACTIVE_PROGRESS');
+        }
+
+        function checkSavedProgress() {
+            const saved = localStorage.getItem('QUIZ_ACTIVE_PROGRESS');
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+                if (data && data.quizBank && data.quizBank.length > 0 && data.currentQuestionIndex < data.quizBank.length) {
+                    document.getElementById('resumeQNum').innerText = data.currentQuestionIndex + 1;
+                    document.getElementById('resumeTotal').innerText = data.quizBank.length;
+                    document.getElementById('resumeCorrect').innerText = data.score;
+                    document.getElementById('resumeWrong').innerText = data.errorList ? data.errorList.length : 0;
+                    
+                    const m = Math.floor(data.totalExamSecondsLeft / 60);
+                    const s = data.totalExamSecondsLeft % 60;
+                    document.getElementById('resumeTimeLeft').innerText = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+
+                    document.getElementById('resumeModal').classList.remove('hidden');
+                }
+            } catch (e) {
+                clearExamProgress();
+            }
+        }
+
+        function resumeSavedExam() {
+            const saved = localStorage.getItem('QUIZ_ACTIVE_PROGRESS');
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+                quizBank = data.quizBank;
+                currentQuestionIndex = data.currentQuestionIndex;
+                score = data.score;
+                errorList = data.errorList || [];
+                totalExamSecondsLeft = data.totalExamSecondsLeft;
+                examConfig = data.examConfig || examConfig;
+
+                document.getElementById('resumeModal').classList.add('hidden');
+                document.getElementById('score-count').innerText = score;
+                document.getElementById('wrong-count').innerText = errorList.length;
+
+                document.getElementById('step-config').classList.add('hidden');
+                document.getElementById('step-exam').classList.remove('hidden');
+
+                document.getElementById('result-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+
+                startTotalExamTimerCustom(totalExamSecondsLeft);
+                renderQuestion();
+                showToast("Đã khôi phục bài làm thành công!", "success");
+            } catch (e) {
+                clearExamProgress();
+                showToast("Không thể phục hồi tiến độ cũ", "error");
+            }
+        }
+
+        function discardSavedExam() {
+            clearExamProgress();
+            document.getElementById('resumeModal').classList.add('hidden');
+            showToast("Đã hủy bài làm cũ. Bạn có thể bắt đầu lại!", "info");
+        }
+
+        function startTotalExamTimerCustom(secondsLeft) {
+            if (totalExamTimer) clearInterval(totalExamTimer);
+            totalExamSecondsLeft = secondsLeft;
+            updateTotalTimeDisplay();
+
+            totalExamTimer = setInterval(() => {
+                totalExamSecondsLeft--;
+                updateTotalTimeDisplay();
+                saveExamProgress();
+
+                if (totalExamSecondsLeft <= 0) {
+                    clearInterval(totalExamTimer);
+                    showToast("Đã hết thời gian làm bài thi!", "warning");
+                    showFinalResult();
+                }
+            }, 1000);
+        }
+
+        function goToExamConfig() {
+            if (totalExamTimer) clearInterval(totalExamTimer);
+            document.getElementById('step-exam').classList.add('hidden');
+            document.getElementById('step-config').classList.remove('hidden');
+        }
+
+        function validateAndStartExam() {
+            clearExamProgress();
+            const numQRadio = document.querySelector('input[name="numExamQuestions"]:checked');
+            const totalTimeRadio = document.querySelector('input[name="totalExamTime"]:checked');
+
+            if (!numQRadio || !totalTimeRadio) {
+                showToast("Vui lòng chọn đầy đủ các thông số bắt buộc (*)", "warning");
+                return;
+            }
+
+            examConfig.totalExamTimeMinutes = parseInt(totalTimeRadio.value);
+
+            if (numQRadio.value === 'ALL') {
+                examConfig.numQuestions = questionBank.length;
+            } else {
+                examConfig.numQuestions = parseInt(numQRadio.value);
+            }
+
+            let shuffledBank = [...questionBank].sort(() => Math.random() - 0.5);
+            quizBank = shuffledBank.slice(0, Math.min(examConfig.numQuestions, shuffledBank.length));
+
+            currentQuestionIndex = 0;
+            score = 0;
+            errorList = [];
+            document.getElementById('score-count').innerText = "0";
+            document.getElementById('wrong-count').innerText = "0";
+
+            document.getElementById('step-config').classList.add('hidden');
+            document.getElementById('step-exam').classList.remove('hidden');
+
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+
+            startTotalExamTimerCustom(examConfig.totalExamTimeMinutes * 60);
+            renderQuestion();
+            saveExamProgress();
+        }
+
+        function updateTotalTimeDisplay() {
+            const m = Math.floor(totalExamSecondsLeft / 60);
+            const s = totalExamSecondsLeft % 60;
+            document.getElementById('total-time-left').innerText = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+        }
+
+        function renderQuestion() {
+            if (currentQuestionIndex >= quizBank.length) {
+                if (totalExamTimer) clearInterval(totalExamTimer);
+                clearExamProgress();
+                return showFinalResult();
+            }
+
+            resetQuestionUI();
+            const currentQ = quizBank[currentQuestionIndex];
+
+            document.getElementById('q-current').innerText = currentQuestionIndex + 1;
+            document.getElementById('q-total').innerText = quizBank.length;
+            document.getElementById('question-text').innerText = currentQ.q;
+
+            const list = document.getElementById('options-list');
+
+            // KIỂM TRA CHẾ ĐỘ GÕ ĐÁP ÁN (TYPING MODE)
+            if (currentQ.type === "typing") {
+                list.innerHTML = `
+                    <div class="space-y-3">
+                        <textarea id="typing-input" rows="3" 
+                            class="w-full p-4 border-2 border-slate-300 rounded-xl focus:border-sky-500 focus:outline-none text-slate-800 text-base font-medium" 
+                            placeholder="Nhập câu trả lời / câu dịch của bạn vào đây (Nhấn Enter để kiểm tra)..."></textarea>
+                        <button id="btn-submit-typing" onclick="checkTypingAnswer()" 
+                            class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-sm transition-all shadow">
+                            <i class="fa-solid fa-check mr-1"></i> Kiểm Tra Đáp Án
+                        </button>
+                    </div>
+                `;
+                const inputBox = document.getElementById('typing-input');
+                inputBox.focus();
+                inputBox.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        checkTypingAnswer();
+                    }
+                });
+            } else {
+                // CHẾ ĐỘ TRẮC NGHIỆM A, B, C, D MẶC ĐỊNH
+                const originalOptions = currentQ.options;
+                const correctText = originalOptions[currentQ.correct];
+
+                let shuffledIndices = originalOptions.map((_, idx) => idx).sort(() => Math.random() - 0.5);
+                currentShuffledOptions = shuffledIndices.map(idx => originalOptions[idx]);
+                correctOptionIndex = currentShuffledOptions.indexOf(correctText);
+
+                currentShuffledOptions.forEach((txt, idx) => {
+                    const b = document.createElement('button');
+                    b.className = 'option-btn';
+                    b.innerText = `${String.fromCharCode(65 + idx)}. ${txt}`;
+                    b.onclick = () => validateAnswer(idx);
+                    list.appendChild(b);
+                });
+            }
+
+            saveExamProgress();
+        }
+
+        function normalizeText(str) {
+            return str.toLowerCase()
+                      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "")
+                      .replace(/\s+/g, " ")
+                      .trim();
+        }
+
+        function checkTypingAnswer() {
+            const inputEl = document.getElementById('typing-input');
+            const submitBtn = document.getElementById('btn-submit-typing');
+            if (!inputEl || inputEl.disabled) return;
+
+            const userAns = inputEl.value.trim();
+            if (!userAns) {
+                showToast("Bạn chưa nhập câu trả lời!", "warning");
+                return;
+            }
+
+            inputEl.disabled = true;
+            if (submitBtn) submitBtn.classList.add('hidden');
+
+            const qData = quizBank[currentQuestionIndex];
+            const isCorrect = normalizeText(userAns) === normalizeText(qData.answer);
+
+            if (isCorrect) {
+                score++;
+                document.getElementById('score-count').innerText = score;
+                inputEl.classList.add('correct');
+            } else {
+                inputEl.classList.add('wrong');
+                errorList.push(qData);
+                document.getElementById('wrong-count').innerText = errorList.length;
+            }
+
+            document.getElementById('exp-area').innerHTML = `
+                <div class="mb-2 text-emerald-800"><b>Đáp án chuẩn:</b> ${qData.answer}</div>
+                <div><b>Ghi chú / Giải thích:</b> ${qData.exp || 'Không có giải thích chi tiết.'}</div>
+            `;
+            document.getElementById('exp-area').classList.remove('hidden');
+            document.getElementById('btn-next').classList.remove('hidden');
+
+            saveExamProgress();
+        }
+function validateAnswer(userPick) {
+            const qData = quizBank[currentQuestionIndex];
+            const btns = document.querySelectorAll('.option-btn');
+
+            btns.forEach(btn => btn.style.pointerEvents = 'none');
+
+            if (userPick === correctOptionIndex) {
+                score++;
+                document.getElementById('score-count').innerText = score;
+                if (userPick !== -1) btns[userPick].classList.add('correct');
+            } else {
+                if (userPick !== -1) btns[userPick].classList.add('wrong');
+                btns[correctOptionIndex].classList.add('correct');
+                errorList.push(qData);
+                document.getElementById('wrong-count').innerText = errorList.length;
+            }
+
+            document.getElementById('exp-area').innerHTML = `<b>Giải thích:</b> ${qData.exp || 'Không có giải thích chi tiết.'}`;
+            document.getElementById('exp-area').classList.remove('hidden');
+            document.getElementById('btn-next').classList.remove('hidden');
+
+            saveExamProgress();
+        }
+
+        function handleNext() {
+            currentQuestionIndex++;
+            renderQuestion();
+        }
+
+        function resetQuestionUI() {
+            document.getElementById('options-list').innerHTML = '';
+            document.getElementById('exp-area').classList.add('hidden');
+            document.getElementById('btn-next').classList.add('hidden');
+        }
+
+        function showFinalResult() {
+            if (totalExamTimer) clearInterval(totalExamTimer);
+            clearExamProgress();
+
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-stats').innerText = `${score} / ${quizBank.length}`;
+
+            const info = document.getElementById('fail-info');
+            if (errorList.length > 0) {
+                info.innerText = `Bạn còn ${errorList.length} câu chưa đạt. Bạn có thể ôn lại các câu này!`;
+            } else {
+                info.innerText = "Xuất sắc! Bạn đã làm đúng toàn bộ câu hỏi trong lượt này.";
+            }
+        }
+
+        function restartWithErrors() {
+            if (errorList.length === 0) {
+                showToast("Bạn đã làm đúng tất cả các câu!", "success");
+                goToExamConfig();
+                return;
+            }
+            quizBank = [...errorList].sort(() => Math.random() - 0.5);
+            errorList = [];
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('score-count').innerText = "0";
+            document.getElementById('wrong-count').innerText = "0";
+
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+
+            startTotalExamTimerCustom(examConfig.totalExamTimeMinutes * 60);
+            renderQuestion();
+            saveExamProgress();
+        }
+
+        function showToast(msg, type = "info") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.textContent = msg;
+
+            if (type === "success") {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
+            } else if (type === "warning") {
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-amber-400 text-base";
+            } else if (type === "error") {
+                toastIcon.className = "fa-solid fa-circle-xmark text-rose-400 text-base";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-info text-sky-400 text-base";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
