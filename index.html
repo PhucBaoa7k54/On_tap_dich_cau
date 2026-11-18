@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Thi Trắc Nghiệm</title>
+    <title>Hệ Thống Thi Dịch Thuật</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -68,7 +68,7 @@
             <div class="flex items-center space-x-3">
                 <div>
                     <h1 class="font-bold text-white text-base sm:text-lg flex items-center gap-2">
-                        <i class="fa-solid fa-scale-balanced text-sky-400"></i> Ôn Thi Trắc Nghiệm
+                        <i class="fa-solid fa-language text-sky-400"></i> Ôn Thi Dịch Thuật
                     </h1>
                     <p class="text-xs text-slate-400 hidden sm:block">Ngân hàng câu hỏi</p>
                 </div>
@@ -94,8 +94,8 @@
                     <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">
                         <i class="fa-solid fa-sliders"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-slate-900">Cấu Hình Thông Số Bài Thi Trắc Nghiệm</h2>
-                    <p class="text-xs text-slate-500 mt-1">Chọn thông số phù hợp để bắt đầu làm bài[cite: 5].</p>
+                    <h2 class="text-lg font-bold text-slate-900">Cấu Hình Thông Số Bài Thi Dịch Thuật</h2>
+                    <p class="text-xs text-slate-500 mt-1">Chọn thông số phù hợp để bắt đầu làm bài.</p>
                 </div>
 
                 <form id="configForm" onsubmit="event.preventDefault(); validateAndStartExam();" class="space-y-6">
@@ -105,36 +105,28 @@
                         <label class="block text-xs font-bold text-slate-800 mb-2 flex items-center gap-1">
                             <span>1. Chọn số lượng câu hỏi làm bài</span> <span class="text-rose-500 font-bold">*</span>
                         </label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <label class="radio-card cursor-pointer">
-                                <input type="radio" name="numExamQuestions" value="20" class="sr-only">
+                                <input type="radio" name="numExamQuestions" value="5" class="sr-only" checked>
                                 <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
                                     <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
-                                    <span class="text-xs font-bold text-slate-700">20 Câu</span>
+                                    <span class="text-xs font-bold text-slate-700">5 Câu</span>
                                 </div>
                             </label>
 
                             <label class="radio-card cursor-pointer">
-                                <input type="radio" name="numExamQuestions" value="40" class="sr-only" checked>
+                                <input type="radio" name="numExamQuestions" value="10" class="sr-only">
                                 <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
                                     <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
-                                    <span class="text-xs font-bold text-slate-700">40 Câu</span>
+                                    <span class="text-xs font-bold text-slate-700">10 Câu</span>
                                 </div>
                             </label>
 
                             <label class="radio-card cursor-pointer">
-                                <input type="radio" name="numExamQuestions" value="60" class="sr-only">
+                                <input type="radio" name="numExamQuestions" value="15" class="sr-only">
                                 <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
                                     <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
-                                    <span class="text-xs font-bold text-slate-700">60 Câu</span>
-                                </div>
-                            </label>
-
-                            <label class="radio-card cursor-pointer">
-                                <input type="radio" name="numExamQuestions" value="ALL" class="sr-only">
-                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
-                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
-                                    <span class="text-xs font-bold text-slate-700">Toàn Bộ</span>
+                                    <span class="text-xs font-bold text-slate-700">15 Câu</span>
                                 </div>
                             </label>
                         </div>
@@ -145,12 +137,12 @@
                         <label class="block text-xs font-bold text-slate-800 mb-2 flex items-center gap-1">
                             <span>2. Chọn thời gian làm bài tổng thể</span> <span class="text-rose-500 font-bold">*</span>
                         </label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <label class="radio-card cursor-pointer">
-                                <input type="radio" name="totalExamTime" value="15" class="sr-only">
+                                <input type="radio" name="totalExamTime" value="20" class="sr-only" checked>
                                 <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
                                     <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
-                                    <span class="text-xs font-bold text-slate-700">15 Phút</span>
+                                    <span class="text-xs font-bold text-slate-700">20 Phút</span>
                                 </div>
                             </label>
 
@@ -163,18 +155,10 @@
                             </label>
 
                             <label class="radio-card cursor-pointer">
-                                <input type="radio" name="totalExamTime" value="45" class="sr-only" checked>
+                                <input type="radio" name="totalExamTime" value="40" class="sr-only">
                                 <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
                                     <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
-                                    <span class="text-xs font-bold text-slate-700">45 Phút</span>
-                                </div>
-                            </label>
-
-                            <label class="radio-card cursor-pointer">
-                                <input type="radio" name="totalExamTime" value="60" class="sr-only">
-                                <div class="border-2 border-slate-200 rounded-xl p-3 text-center transition-all flex items-center justify-center gap-2">
-                                    <div class="w-3.5 h-3.5 rounded-full border border-slate-300 radio-dot"></div>
-                                    <span class="text-xs font-bold text-slate-700">60 Phút</span>
+                                    <span class="text-xs font-bold text-slate-700">40 Phút</span>
                                 </div>
                             </label>
                         </div>
@@ -197,7 +181,7 @@
         <div id="step-exam" class="hidden w-full flex-1 flex justify-center items-start pt-2">
             <div id="quiz-container">
                 <div class="quiz-header">
-                    <h1 class="text-xl font-bold tracking-wide">BÀI THI TRẮC NGHIỆM LUẬT TTHC 2015</h1>
+                    <h1 class="text-xl font-bold tracking-wide">BÀI THI DỊCH THUẬT TIẾNG ANH CHUYÊN NGÀNH</h1>
                 </div>
 
                 <!-- Exam Screen -->
@@ -256,7 +240,7 @@
             <div>
                 <h3 class="font-bold text-slate-900 text-base">Phát hiện bài làm chưa hoàn thành!</h3>
                 <p class="text-xs text-slate-500 mt-1 leading-relaxed" id="resumeModalInfo">
-                    Bạn đang làm dở ở <b>câu <span id="resumeQNum">1</span></b> với thời gian còn lại <b><span id="resumeTimeLeft">00:00</span></b>[cite: 5].
+                    Bạn đang làm dở ở <b>câu <span id="resumeQNum">1</span></b> với thời gian còn lại <b><span id="resumeTimeLeft">00:00</span></b>.
                 </p>
             </div>
             <div class="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 flex justify-around font-semibold border border-slate-200">
@@ -281,330 +265,6 @@
     <script>
         // Dữ liệu ngân hàng câu hỏi tích hợp sẵn từ file Luật TTHC 2015
         const questionBank = [
-// ==================== UNIT 9: COMPANY INTERNAL FINANCE ====================
-  {
-    "q": "Câu 61 (Unit 9 - I.1): The café Bong runs a membership program, and members are .......... to a 15% discount.",
-    "options": [
-      "close",
-      "subject",
-      "apt",
-      "entitled"
-    ],
-    "correct": 3,
-    "exp": "Cấu trúc 'be entitled to something' nghĩa là có quyền được hưởng ưu đãi/quyền lợi gì."
-  },
-  {
-    "q": "Câu 62 (Unit 9 - I.2): The company delayed its expansion plans .......... rising operating costs.",
-    "options": [
-      "because of",
-      "because",
-      "although",
-      "since"
-    ],
-    "correct": 0,
-    "exp": "Sau chỗ trống là cụm danh từ 'rising operating costs' nên dùng giới từ 'because of' (bởi vì)."
-  },
-  {
-    "q": "Câu 63 (Unit 9 - I.3): If we offer incentives for quick payment, our customers .......... more quickly.",
-    "options": [
-      "will pay",
-      "would pay",
-      "should pay",
-      "must pay"
-    ],
-    "correct": 0,
-    "exp": "Câu điều kiện loại 1 (điều kiện có thể xảy ra ở hiện tại/tương lai): If + S + V(hiện tại đơn), S + will + V(nguyên thể)."
-  },
-  {
-    "q": "Câu 64 (Unit 9 - I.4): General Motors plans to .......... shareholders a higher dividend this year.",
-    "options": [
-      "offer",
-      "deduct",
-      "calculate",
-      "reduce"
-    ],
-    "correct": 0,
-    "exp": "Cụm từ 'offer shareholders a higher dividend' mang nghĩa trả/chia cho cổ đông mức cổ tức cao hơn."
-  },
-  {
-    "q": "Câu 65 (Unit 9 - I.5): Its machines have to be .......... every three years because of new technology and this uses up a lot of its profits every year.",
-    "options": [
-      "replace",
-      "replacing",
-      "replaced",
-      "replacement"
-    ],
-    "correct": 2,
-    "exp": "Cấu trúc bị động với động từ khuyết thiếu: 'have to be + V3/ed' (cần được thay thế)."
-  },
-  {
-    "q": "Câu 66 (Unit 9 - I.6): One of the finance managers .......... responsible for preparing the annual income statement.",
-    "options": [
-      "is",
-      "are",
-      "were",
-      "have been"
-    ],
-    "correct": 0,
-    "exp": "Chủ ngữ chính là 'One of + danh từ số nhiều' nên động từ chia ở ngôi thứ 3 số ít ('is')."
-  },
-  {
-    "q": "Câu 67 (Unit 9 - I.7): The site is worth $20m, but .......... needs modernization and the company doesn't have the funds to do the work.",
-    "options": [
-      "bad",
-      "badly",
-      "worse",
-      "worst"
-    ],
-    "correct": 1,
-    "exp": "Cần một trạng từ ('badly' - rất/vô cùng) để bổ nghĩa cho động từ 'needs' phía sau."
-  },
-  {
-    "q": "Câu 68 (Unit 9 - I.8): The company has recovered .......... a huge setback, but it still has a lot of things to do to improve its sales.",
-    "options": [
-      "for",
-      "except",
-      "from",
-      "despite"
-    ],
-    "correct": 2,
-    "exp": "Cụm động từ cố định 'recover from something' nghĩa là phục hồi sau một thất bại/trở ngại."
-  },
-  {
-    "q": "Câu 69 (Unit 9 - I.9): A research shows that when a company .......... its operating costs, its profits usually increase.",
-    "options": [
-      "reduces",
-      "reduce",
-      "reducing",
-      "reduced"
-    ],
-    "correct": 0,
-    "exp": "Diễn tả một sự thật/quy luật chung ở thì hiện tại đơn; chủ ngữ 'a company' số ít nên động từ thêm 's' ('reduces')."
-  },
-  {
-    "q": "Câu 70 (Unit 9 - I.10): If the company had higher operating profits, it .......... pay larger dividends to its shareholders.",
-    "options": [
-      "will",
-      "would",
-      "can",
-      "must"
-    ],
-    "correct": 1,
-    "exp": "Câu điều kiện loại 2 (giả định trái với hiện tại): If + S + V(quá khứ đơn - had), S + would + V(nguyên thể)."
-  },
-
-  // ==================== REVIEW 1 ====================
-  {
-    "q": "Câu 71 (Review 1 - I.1): In the UK, the primary sector is .......... up of farming and energy-related activities.",
-    "options": [
-      "making",
-      "made",
-      "to make",
-      "makes"
-    ],
-    "correct": 1,
-    "exp": "Cấu trúc bị động cố định 'be made up of...' nghĩa là được cấu thành/bao gồm bởi (Lưu ý: sách khoanh A là nhầm)."
-  },
-  {
-    "q": "Câu 72 (Review 1 - I.2): Many investors look for .......... companies with strong long-term growth.",
-    "options": [
-      "profit",
-      "profitable",
-      "profitability",
-      "profitably"
-    ],
-    "correct": 1,
-    "exp": "Cần một tính từ đứng trước danh từ 'companies' để tạo cụm danh từ 'profitable companies' (các công ty có khả năng sinh lời)."
-  },
-  {
-    "q": "Câu 73 (Review 1 - I.3): Most companies .......... shares to raise money for future expansion.",
-    "options": [
-      "issue",
-      "spread",
-      "quote",
-      "underwrite"
-    ],
-    "correct": 0,
-    "exp": "Cụm từ chuyên ngành 'issue shares' nghĩa là phát hành cổ phiếu để huy động vốn."
-  },
-  {
-    "q": "Câu 74 (Review 1 - I.4): Despite government support, the sector has .......... from 20% to 15% of GDP over past twenty years.",
-    "options": [
-      "rose",
-      "grown",
-      "decreased",
-      "increased"
-    ],
-    "correct": 2,
-    "exp": "Tỷ trọng giảm từ 20% xuống 15% nên dùng động từ 'decreased' (giảm xuống)."
-  },
-  {
-    "q": "Câu 75 (Review 1 - I.5): .......... agriculture employs only 1% of the workforce, it produces 60% of UK food.",
-    "options": [
-      "Although",
-      "Despite",
-      "However",
-      "In spite of"
-    ],
-    "correct": 0,
-    "exp": "Sau chỗ trống là một mệnh đề đầy đủ (S + V) mang nghĩa tương phản nên dùng liên từ 'Although' (Mặc dù)."
-  },
-  {
-    "q": "Câu 76 (Review 1 - I.6): The retail bank focuses on individual customers, .......... the investment bank mainly serves large companies.",
-    "options": [
-      "because",
-      "whereas",
-      "therefore",
-      "unless"
-    ],
-    "correct": 1,
-    "exp": "Liên từ 'whereas' (trong khi đó) dùng để nối hai mệnh đề có chức năng đối lập nhau."
-  },
-  {
-    "q": "Câu 77 (Review 1 - I.7): What special .......... do they offer companies?",
-    "options": [
-      "auditors",
-      "investors",
-      "incentives",
-      "mergers"
-    ],
-    "correct": 2,
-    "exp": "Danh từ 'incentives' (các chính sách ưu đãi/khuyến khích) phù hợp về nghĩa với động từ 'offer'."
-  },
-  {
-    "q": "Câu 78 (Review 1 - I.8): The cash flow of a company is a simple record of the real .......... of money into, and out of, the company's accounts.",
-    "options": [
-      "movement",
-      "move",
-      "moving",
-      "moved"
-    ],
-    "correct": 0,
-    "exp": "Sau mạo từ 'the' và tính từ 'real' cần một danh từ ('movement' - sự luân chuyển/dịch chuyển dòng tiền)."
-  },
-  {
-    "q": "Câu 79 (Review 1 - I.9): During her internship, she .......... working with the finance team.",
-    "options": [
-      "enjoyed",
-      "wanted",
-      "would like",
-      "decided"
-    ],
-    "correct": 0,
-    "exp": "Chỉ có động từ 'enjoy' đi kèm trực tiếp với danh động từ V-ing ('enjoyed working'), các từ còn lại đi với to-V."
-  },
-  {
-    "q": "Câu 80 (Review 1 - I.10): The financial adviser encouraged the company .......... its operating costs.",
-    "options": [
-      "reduce",
-      "reducing",
-      "to reduce",
-      "reduced"
-    ],
-    "correct": 2,
-    "exp": "Cấu trúc 'encourage someone to do something' (khuyến khích ai/tổ chức nào làm gì)."
-  },
-
-  // ==================== UNIT 10: COMPANY REPORTING ====================
-  {
-    "q": "Câu 81 (Unit 10 - I.1): A company's .......... report is a comprehensive document containing complex details, including its financial accounts.",
-    "options": [
-      "financial",
-      "economic",
-      "strategic",
-      "annual"
-    ],
-    "correct": 3,
-    "exp": "Thuật ngữ 'annual report' nghĩa là báo cáo thường niên của công ty."
-  },
-  {
-    "q": "Câu 82 (Unit 10 - I.2): It is a legal requirement for public companies to publish an annual report each year and send it to all ..........",
-    "options": [
-      "publishers",
-      "shareholders",
-      "investors",
-      "sellers"
-    ],
-    "correct": 1,
-    "exp": "Theo luật, công ty đại chúng phải gửi báo cáo thường niên tới tất cả các cổ đông ('shareholders')."
-  },
-  {
-    "q": "Câu 83 (Unit 10 - I.3): Most of the patient files are stored .......... secure cabinets on the fourth floor, which has a high level of security.",
-    "options": [
-      "over",
-      "by",
-      "to",
-      "in"
-    ],
-    "correct": 3,
-    "exp": "Lưu trữ hồ sơ bên trong tủ bảo mật dùng giới từ 'in' ('stored in secure cabinets')."
-  },
-  {
-    "q": "Câu 84 (Unit 10 - I.4): In the middle sections of a UK report there is now a section called .........., which explains the way the company is managed by its board of directors.",
-    "options": [
-      "corporate governance",
-      "corporate govern",
-      "corporate governing",
-      "corporated govern"
-    ],
-    "correct": 0,
-    "exp": "Thuật ngữ kinh tế chuẩn xác là 'corporate governance' (quản trị doanh nghiệp)."
-  },
-  {
-    "q": "Câu 85 (Unit 10 - I.5): By encouraging innovative promotional ideas, the company hopes to gain a .......... market share than it had previously.",
-    "options": [
-      "highly",
-      "high",
-      "higher",
-      "highest"
-    ],
-    "correct": 2,
-    "exp": "Có từ 'than' phía sau nên sử dụng tính từ so sánh hơn 'higher' (thị phần cao hơn)."
-  },
-  {
-    "q": "Câu 86 (Unit 10 - I.6): Prior .......... starting the tournament, they shook hands and promised to play fair.",
-    "options": [
-      "to",
-      "than",
-      "as",
-      "before"
-    ],
-    "correct": 0,
-    "exp": "Cụm giới từ cố định 'prior to + V-ing/N' có nghĩa là trước khi làm gì."
-  },
-  {
-    "q": "Câu 87 (Unit 10 - I.7): Rev Furniture has high-quality handmade goods and reasonable delivery ..........",
-    "options": [
-      "routines",
-      "trucks",
-      "duties",
-      "fees"
-    ],
-    "correct": 3,
-    "exp": "Cụm danh từ 'delivery fees' nghĩa là phí vận chuyển/giao hàng."
-  },
-  {
-    "q": "Câu 88 (Unit 10 - I.8): Politicians are said to be the .......... reliable people in the world; nevertheless, there are always some people who seek such a career.",
-    "options": [
-      "less",
-      "least",
-      "more",
-      "worst"
-    ],
-    "correct": 1,
-    "exp": "Có mạo từ 'the' phía trước tính từ dài 'reliable' nên dùng cấu trúc so sánh nhất 'the least reliable' (kém đáng tin cậy nhất)."
-  },
-  {
-    "q": "Câu 89 (Unit 10 - I.9): At the end of the report, you will always find the .......... statements: these contain essential information for investors.",
-    "options": [
-      "financially",
-      "financial",
-      "finance",
-      "financing"
-    ],
-    "correct": 1,
-    "exp": "Thuật ngữ kế toán - tài chính chuẩn là 'financial statements' (báo cáo tài chính)."
-  },
 {
     "type": "typing",
     "q": "Dịch sang tiếng Việt (Unit 9 - IV.1.a): If we can reduce the price we are paying for materials, we'll be able to make some savings.",
@@ -702,21 +362,21 @@
         ];
 
         let examConfig = {
-            numQuestions: 40,
-            totalExamTimeMinutes: 45
+            numQuestions: 5,
+            totalExamTimeMinutes: 20
         };
 
         let quizBank = [];
         let currentQuestionIndex = 0;
         let score = 0;
         let totalExamTimer = null;
-        let totalExamSecondsLeft = 2700;
+        let totalExamSecondsLeft = 1200;
         let errorList = [];
         let currentShuffledOptions = [];
         let correctOptionIndex = 0;
 
         window.onload = () => {
-            document.getElementById('bankBadge').innerText = `${questionBank.length} câu`;
+            document.getElementById('bankBadge').innerText = `${questionBank.filter(item => item.type === 'typing').length} câu`;
             checkSavedProgress();
         };
 
@@ -730,15 +390,15 @@
                 examConfig: examConfig,
                 timestamp: Date.now()
             };
-            localStorage.setItem('QUIZ_ACTIVE_PROGRESS', JSON.stringify(progressData));
+            localStorage.setItem('TRANSLATION_QUIZ_PROGRESS', JSON.stringify(progressData));
         }
 
         function clearExamProgress() {
-            localStorage.removeItem('QUIZ_ACTIVE_PROGRESS');
+            localStorage.removeItem('TRANSLATION_QUIZ_PROGRESS');
         }
 
         function checkSavedProgress() {
-            const saved = localStorage.getItem('QUIZ_ACTIVE_PROGRESS');
+            const saved = localStorage.getItem('TRANSLATION_QUIZ_PROGRESS');
             if (!saved) return;
 
             try {
@@ -761,7 +421,7 @@
         }
 
         function resumeSavedExam() {
-            const saved = localStorage.getItem('QUIZ_ACTIVE_PROGRESS');
+            const saved = localStorage.getItem('TRANSLATION_QUIZ_PROGRESS');
             if (!saved) return;
 
             try {
@@ -834,13 +494,10 @@
 
             examConfig.totalExamTimeMinutes = parseInt(totalTimeRadio.value);
 
-            if (numQRadio.value === 'ALL') {
-                examConfig.numQuestions = questionBank.length;
-            } else {
-                examConfig.numQuestions = parseInt(numQRadio.value);
-            }
+            examConfig.numQuestions = parseInt(numQRadio.value);
 
-            let shuffledBank = [...questionBank].sort(() => Math.random() - 0.5);
+            const translationBank = questionBank.filter(item => item.type === 'typing');
+            let shuffledBank = [...translationBank].sort(() => Math.random() - 0.5);
             quizBank = shuffledBank.slice(0, Math.min(examConfig.numQuestions, shuffledBank.length));
 
             currentQuestionIndex = 0;
